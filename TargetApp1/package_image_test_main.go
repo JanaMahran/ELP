@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"sync"
 
 
 	// image.Decode peut grâce aux importations suivantes comprendre les images de format JPEG, PNG et GIF
