@@ -53,46 +53,101 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ Html.Attributes.style "text-align" "center" ]
-        [ Html.h1 [ Html.Attributes.style "font-size" "2em", Html.Attributes.style "color" "#333" ] [ text "Welcome to TcTurtle!" ]
-        , Html.p [ Html.Attributes.style "font-size" "1.2em", Html.Attributes.style "color" "#666", Html.Attributes.style "margin-bottom" "20px" ] [ text "Start by writing the following instruction! xx" ]
-        , div [ Html.Attributes.style "margin" "auto", Html.Attributes.style "width" "80%", Html.Attributes.style "display" "flex", Html.Attributes.style "justify-content" "space-between" ]
-            [ div [ Html.Attributes.style "width" "65%", Html.Attributes.style "text-align" "left" ]
+    div [ Html.Attributes.style "display" "flex"
+        , Html.Attributes.style "flex-direction" "column"
+        , Html.Attributes.style "align-items" "center"
+        , Html.Attributes.style "justify-content" "center"
+        , Html.Attributes.style "min-height" "100vh"
+        , Html.Attributes.style "background-color" "#f0f4f8"
+        , Html.Attributes.style "font-family" "Arial, sans-serif"
+        , Html.Attributes.style "color" "#333"
+        , Html.Attributes.style "padding" "20px"
+        ]
+        [ Html.h1 [ Html.Attributes.style "font-size" "2.5em"
+                  , Html.Attributes.style "color" "#1e3a8a"
+                  , Html.Attributes.style "margin-bottom" "5px"
+                  ]
+            [ text "Welcome to TcTurtle!" ]
+        , Html.p [ Html.Attributes.style "font-size" "1.1em"
+                 , Html.Attributes.style "color" "#4b5563"
+                 , Html.Attributes.style "margin-bottom" "20px"
+                 , Html.Attributes.style "font-weight" "normal"
+                 ]
+            [ text "Enter a program to parse and draw below:" ]
+        , div [ Html.Attributes.style "display" "flex"
+              , Html.Attributes.style "gap" "20px"
+              , Html.Attributes.style "width" "100%"
+              , Html.Attributes.style "max-width" "900px"
+              , Html.Attributes.style "height" "75vh"
+              ]
+            [ div [ Html.Attributes.style "flex" "2"
+                  , Html.Attributes.style "padding" "20px"
+                  , Html.Attributes.style "background-color" "white"
+                  , Html.Attributes.style "box-shadow" "0 4px 8px rgba(0, 0, 0, 0.1)"
+                  , Html.Attributes.style "border-radius" "12px"
+                  , Html.Attributes.style "overflow-y" "auto"
+                  , Html.Attributes.style "max-height" "100%"
+                  ]
                 [ input
                     [ placeholder "Enter your TcTurtle program here"
                     , value model.userInput
                     , onInput UpdateInput
-                    , Html.Attributes.style "width" "100%"
+                    , Html.Attributes.style "width" "95%"
+                    , Html.Attributes.style "padding" "12px"
+                    , Html.Attributes.style "font-size" "1em"
+                    , Html.Attributes.style "border" "1px solid #d1d5db"
+                    , Html.Attributes.style "border-radius" "8px"
+                    , Html.Attributes.style "margin-bottom" "12px"
+                    , Html.Attributes.style "background-color" "#f9fafb"
                     ]
                     []
                 , button
                     [ onClick ParseInput
-                    , Html.Attributes.style "background-color" "grey"
+                    , Html.Attributes.style "background-color" "#1e40af"
                     , Html.Attributes.style "color" "white"
                     , Html.Attributes.style "font-size" "1em"
-                    , Html.Attributes.style "padding" "10px 20px"
+                    , Html.Attributes.style "padding" "12px"
                     , Html.Attributes.style "border" "none"
-                    , Html.Attributes.style "border-radius" "5px"
+                    , Html.Attributes.style "border-radius" "8px"
                     , Html.Attributes.style "width" "100%"
-                    , Html.Attributes.style "margin-top" "10px"
+                    , Html.Attributes.style "cursor" "pointer"
+                    , Html.Attributes.style "box-shadow" "0 4px 6px rgba(0, 0, 0, 0.1)"
                     ]
                     [ text "Parse and Draw" ]
-                , div [ Html.Attributes.style "margin-top" "20px" ]
+                , div [ Html.Attributes.style "margin-top" "20px"
+                      , Html.Attributes.style "overflow-y" "auto"
+                      , Html.Attributes.style "max-height" "60vh"
+                      , Html.Attributes.style "padding" "10px"
+                      , Html.Attributes.style "border" "1px solid #d1d5db"
+                      , Html.Attributes.style "border-radius" "8px"
+                      , Html.Attributes.style "background-color" "#f9fafb"
+                      ]
                     [ viewOutput model.parsedInstructions ]
                 ]
-            , div [ Html.Attributes.style "width" "30%", Html.Attributes.style "background-color" "grey", Html.Attributes.style "padding" "10px", Html.Attributes.style "border-radius" "5px", Html.Attributes.style "color" "white" ]
-                [ Html.h2 [ Html.Attributes.style "font-size" "1.5em", Html.Attributes.style "color" "white" ] [ text "TcTurtle Examples" ]
-                , Html.ul []
-                    [ Html.li [] [ text "To draw a square:[ Repeat 4 [ Forward 100 Left 90 ] ]" ]
-                    , Html.li [] [ text "To draw a star:[ Repeat 5 [ Forward 100, Right 144 ] ]" ]
-                    , Html.li [] [ text "To draw a circle:[ Repeat 36 [ Forward 10, Right 10 ] ]" ]
-                    , Html.li [] [ text "To draw a triangle:[ Repeat 3 [ Forward 100, Left 120 ] ]" ]
-                    , Html.li [] [ text "To draw a hexagon:[ Repeat 6 [ Forward 100, Left 60 ] ]" ]
-                    , Html.li [] [ text "To draw a spiral:[ Repeat 36 [ Forward 10, Right 10 ] ]" ]
+            , div [ Html.Attributes.style "flex" "1"
+                  , Html.Attributes.style "padding" "20px"
+                  , Html.Attributes.style "background-color" "#1e3a8a"
+                  , Html.Attributes.style "color" "white"
+                  , Html.Attributes.style "border-radius" "12px"
+                  , Html.Attributes.style "box-shadow" "0 4px 8px rgba(0, 0, 0, 0.1)"
+                  , Html.Attributes.style "overflow-y" "auto"
+                  , Html.Attributes.style "max-height" "100%"
+                  ]
+                [ Html.h2 [ Html.Attributes.style "font-size" "1.8em", Html.Attributes.style "margin-bottom" "16px" ] [ text "TcTurtle Examples" ]
+                , Html.ul [ Html.Attributes.style "list-style-type" "none", Html.Attributes.style "padding" "0" ]
+                    [ Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Square: [ Repeat 4 [ Forward 100, Left 90 ] ]" ]
+                    , Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Star: [ Repeat 5 [ Forward 100, Right 144 ] ]" ]
+                    , Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Circle: [ Repeat 36 [ Forward 10, Right 10 ] ]" ]
+                    , Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Triangle: [ Repeat 3 [ Forward 100, Left 120 ] ]" ]
+                    , Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Hexagon: [ Repeat 6 [ Forward 100, Left 60 ] ]" ]
+                    , Html.li [ Html.Attributes.style "margin-bottom" "16px" ] [ text "Spiral: [ Repeat 36 [ Forward 10, Right 10 ] ]" ]
                     ]
                 ]
             ]
         ]
+
+
+
 
 
 
