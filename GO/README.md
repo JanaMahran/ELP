@@ -7,7 +7,8 @@ Un client s'y connecte et transmet les informations suivantes : l'image à trait
 - 1 : Niveaux de gris
 - 2 : Détection de contours 
 - 3 - Netteté  
-- 4 - Flou gaussien
+- 4 - Flou gaussien  
+
 Le serveur filtre cette image en appliquant un Kernel correspondant au filtre. Cela se fait de manière parallèle, l'image étant découpée en 4 morceaux à traiter, chacun dans une goroutine différente.
 Il renvoie ensuite l'image filtrée en indiquant au client l'emplacement à laquelle il peut la trouver.
 Le serveur peut traiter plusieurs requêtes de clients à la fois, en traitant chaque client dans une goroutine qui lui est propre.
