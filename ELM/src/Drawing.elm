@@ -7,12 +7,15 @@ import TCParser exposing (Instruction(..))  -- Import the Instruction type
 
 -- STATE
 
+-- defines the structure of the turtle's state
+
 type alias State msg =
     { position : (Float, Float)
     , angle : Float  -- Angle in degrees
     , lines : List (Svg msg) -- Accumulated SVG lines
     }
 
+-- defines the initial state of the turtle
 
 initialState : State msg
 initialState =
@@ -24,6 +27,9 @@ initialState =
 
 -- DRAWING FUNCTION
 
+-- takes a list of drawing instructions and produces an SVG element
+-- applies each instruction to the initial state and accumulates the resulting SVG lines
+
 drawInstructions : List Instruction -> Svg msg
 drawInstructions instructions =
     let
@@ -32,6 +38,8 @@ drawInstructions instructions =
     in
     g [] finalState.lines
 
+-- modifies the turtle's state based on a given instruction
+-- it updates the position, angle, or draws lines dependint on instruction type
 
 processInstruction : Instruction -> State msg -> State msg
 processInstruction instruction state =
@@ -80,7 +88,7 @@ processInstruction instruction state =
 
 
 -- HELPER FUNCTIONS
-
+-- to convert degrees to radians
 degreesToRadians : Float -> Float
 degreesToRadians degrees =
     degrees * pi / 180
