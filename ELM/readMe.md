@@ -2,7 +2,7 @@
 
 ## Lancer le projet
 
-### 1. Accéder au répertoire Elm
+### Accéder au répertoire Elm
 
 Ouvrez un terminal et naviguez jusqu'au répertoire contenant votre projet Elm en utilisant la commande suivante :
 
