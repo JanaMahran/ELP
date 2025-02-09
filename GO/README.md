@@ -94,7 +94,7 @@ Rappel : <filter_type> est un entier, qui doit être parmi les valeurs suivantes
 
 Lorsque vous êtes dans un terminal dans le répertoire du projet, lancez le script avec la commande :
 ```
-bash server_et_clients.sh <image>
+bash server_et_clients.sh <image_path>
 ```
-avec <image> le chemin d'accès vers l'image sur laquelle on souhaite appliquer les filtres.  
+avec <image_path> le chemin d'accès vers l'image sur laquelle on souhaite appliquer les filtres.  
 (Rappel : Il n'y a pas de choix de filtre ici puisque tous seront appliqués.)
