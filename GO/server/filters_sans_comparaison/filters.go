@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
-	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -14,19 +12,18 @@ import (
 	"time"
 )
 
-// ApplyFilters applique le filtre sélectionné à l'image d'entrée et sauvegarde le résultat
+// ApplyFilters permet l'ouverture du fichier image, la détermination de son format, et de son décodage en un objet image.Image
+// elle englobe l'application du filtre sélectionné à l'image d'entrée selon son extension et la sauvegarde le résultat, en fournissant les paramètres nécessaires à processImage
 func ApplyFilters(filterType int, inputPath, outputPath string) error {
-	// Ouvrir l'image
+	// Ouverture de l'image
 	reader, err := os.Open(inputPath)
 	if err != nil {
 		return fmt.Errorf("erreur lors de l'ouverture de l'image : %w", err)
 	}
 	defer reader.Close()
 
-	// Décoder l'image en fonction de son extension
+	// Décodage de l'image en fonction de son extension (jpg ou png!)
 	switch {
-	case strings.HasSuffix(strings.ToLower(inputPath), ".gif"):
-		return processGIF(filterType, reader, outputPath)
 	case strings.HasSuffix(strings.ToLower(inputPath), ".jpg"), strings.HasSuffix(strings.ToLower(inputPath), ".jpeg"):
 		img, err := jpeg.Decode(reader)
 		if err != nil {
@@ -44,61 +41,14 @@ func ApplyFilters(filterType int, inputPath, outputPath string) error {
 	}
 }
 
-// processGIF traite un fichier GIF
-func processGIF(filterType int, reader *os.File, outputPath string) error {
-	// Décoder le GIF
-	gifImg, err := gif.DecodeAll(reader)
-	if err != nil {
-		return fmt.Errorf("erreur lors du décodage du GIF : %w", err)
-	}
-
-	// Traiter chaque frame du GIF
-	processedFrames := make([]*image.Paletted, len(gifImg.Image))
-	for i, frame := range gifImg.Image {
-		// Convertir la frame en image.Image
-		img := image.NewRGBA(frame.Bounds())
-		draw.Draw(img, img.Bounds(), frame, frame.Bounds().Min, draw.Src)
-
-		// Appliquer le filtre
-		processedImg, err := applyFilterToImage(filterType, img)
-		if err != nil {
-			return fmt.Errorf("erreur lors du traitement de la frame %d : %w", i, err)
-		}
-
-		// Convertir l'image traitée en image.Paletted
-		palettedImg := image.NewPaletted(processedImg.Bounds(), frame.Palette)
-		draw.Draw(palettedImg, palettedImg.Bounds(), processedImg, processedImg.Bounds().Min, draw.Src)
-		processedFrames[i] = palettedImg
-	}
-
-	// Sauvegarder le GIF traité
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("erreur lors de la création du fichier de sortie : %w", err)
-	}
-	defer outputFile.Close()
-
-	err = gif.EncodeAll(outputFile, &gif.GIF{
-		Image:     processedFrames,
-		Delay:     gifImg.Delay,
-		LoopCount: gifImg.LoopCount,
-	})
-	if err != nil {
-		return fmt.Errorf("erreur lors de l'encodage du GIF : %w", err)
-	}
-
-	return nil
-}
-
-// processImage traite une image statique (JPEG, PNG)
+// applique filtre sur image et enregistre le résultat
 func processImage(filterType int, img image.Image, outputPath string) error {
-	// Appliquer le filtre
 	processedImg, err := applyFilterToImage(filterType, img)
 	if err != nil {
 		return fmt.Errorf("erreur lors du traitement de l'image : %w", err)
 	}
 
-	// Sauvegarder l'image traitée
+	// Sauvegarde de l'image traitée
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("erreur lors de la création du fichier de sortie : %w", err)
@@ -120,16 +70,16 @@ func processImage(filterType int, img image.Image, outputPath string) error {
 	return nil
 }
 
-// applyFilterToImage applique un filtre à une image
+// applyFilterToImage applique le filtre en entrée à une image
 func applyFilterToImage(filterType int, img image.Image) (image.Image, error) {
-	// Convertir l'image en matrice de pixels
+	// On convertit d'abord l'image en une matrice de pixels pour pouvoir agir dessus
 	matrix := imageToMatrix(img)
 
-	// Définir le kernel en fonction du filtre sélectionné
+	// Définition du kernel qui sera utilisé en fonction du filtre sélectionné
 	var kernel [][]float64
 	switch filterType {
 	case 1:
-		kernel = [][]float64{ // Grayscale (pas de kernel, conversion directe)
+		kernel = [][]float64{ // Grayscale (dans ce cas pas de kernel, conversion directe)
 			{0.299, 0.587, 0.114},
 		}
 	case 2:
@@ -150,11 +100,12 @@ func applyFilterToImage(filterType int, img image.Image) (image.Image, error) {
 			{2 / 16.0, 4 / 16.0, 2 / 16.0},
 			{1 / 16.0, 2 / 16.0, 1 / 16.0},
 		}
+		//on met .0 pour avoir des floats car en go division de deux entiers donne entier
 	default:
 		return nil, fmt.Errorf("filtre non reconnu : %d", filterType)
 	}
 
-	// Appliquer le kernel à la matrice de pixels
+	// Application du kernel à la matrice de pixels
 	var outputMatrix [][][4]uint8
 	if filterType == 1 {
 		// Conversion directe en niveaux de gris
@@ -166,7 +117,7 @@ func applyFilterToImage(filterType int, img image.Image) (image.Image, error) {
 		fmt.Printf("Temps d'exécution avec goroutines : %v\n", elapsedParallel)
 	}
 
-	// Convertir la matrice de pixels en image
+	// On reconvertit la matrice de pixels en image
 	return matrixToImage(outputMatrix), nil
 }
 
@@ -211,7 +162,7 @@ func matrixToImage(matrix [][][4]uint8) *image.RGBA {
 	return img
 }
 
-// applyGrayscale convertit une matrice de pixels en niveaux de gris
+// applyGrayscale convertit une matrice de pixels en niveaux de gris $
 func applyGrayscale(matrix [][][4]uint8) [][][4]uint8 {
 	height := len(matrix)
 	width := len(matrix[0])
@@ -222,13 +173,14 @@ func applyGrayscale(matrix [][][4]uint8) [][][4]uint8 {
 		for x := 0; x < width; x++ {
 			pixel := matrix[y][x]
 			gray := uint8(0.299*float64(pixel[0]) + 0.587*float64(pixel[1]) + 0.114*float64(pixel[2]))
+			//on obtient les valeurs de gris en pondérant avec des coefficients connus la valeur des canaux r g et b (choix de ne pas moyenner pour ce filtre)
 			output[y][x] = [4]uint8{gray, gray, gray, pixel[3]}
 		}
 	}
 	return output
 }
 
-// applyKernelParallel applique un kernel à une matrice de pixels en parallèle
+// applyKernelParallel applique un kernel à une matrice de pixels en parallèle, avec plusieurs goroutines qui gèrent chacune un bout de la matruce
 func applyKernelParallel(matrix [][][4]uint8, kernel [][]float64) [][][4]uint8 {
 	height := len(matrix)
 	width := len(matrix[0])
@@ -251,7 +203,7 @@ func applyKernelParallel(matrix [][][4]uint8, kernel [][]float64) [][][4]uint8 {
 		}
 	}
 
-	// Démarrer les goroutines
+	// Démarrage des goroutines
 	for i := 0; i < numWorkers; i++ {
 		start := i * rowsPerWorker
 		end := start + rowsPerWorker
@@ -287,7 +239,7 @@ func applyKernel(matrix [][][4]uint8, kernel [][]float64, x, y int) [4]uint8 {
 		}
 	}
 
-	// Limiter les valeurs des pixels à l'intervalle 0 à 255
+	// on limite les valeurs des pixels à l'intervalle 0 à 255
 	clamp := func(v float64) uint8 {
 		if v < 0 {
 			return 0

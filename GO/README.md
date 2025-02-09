@@ -9,14 +9,38 @@ Un client s'y connecte et transmet les informations suivantes : l'image à trait
 - 3 - Netteté  
 - 4 - Flou gaussien  
 
-Le serveur filtre cette image en appliquant un Kernel correspondant au filtre. Cela se fait de manière parallèle, l'image étant découpée en 4 morceaux à traiter, chacun dans une goroutine différente.
+### Fonctionnement du filtrage par le serveur  
+
+Le serveur filtre l'image donnée en appliquant un Kernel correspondant au filtre. Cela se fait de manière parallèle, l'image étant découpée en 4 morceaux à traiter, chacun dans une goroutine différente.
 Il renvoie ensuite l'image filtrée en indiquant au client l'emplacement à laquelle il peut la trouver.
-Le serveur peut traiter plusieurs requêtes de clients à la fois, en traitant chaque client dans une goroutine qui lui est propre.
+
+De plus, par défaut, le serveur applique également le filtre de manière séquentielle avant de le faire en parallèle. Il utilise ce calcul pour comparer les temps d'exécution des deux méthodes.  
+Si vous ne voulez pas cette comparaison, remplacez dans server.go les import comme suit :
+```
+import (
+"GO/server/filters_sans_comparaison"
+)
+```  
+
+Le serveur peut traiter plusieurs requêtes de clients à la fois, en traitant chaque client dans une goroutine qui lui est propre.  
+
+### Différentes manière de lancer des clients
 
 Nous avons implémenté deux versions différentes de client :
 - une sans IHM, plus adaptée pour tester plusieurs clients rapidement.
 - une avec IHM où toutes les informations sont détaillées.
-Les manières de les exécuter sont décrites ci-dessous.
+Les manières de les exécuter sont décrites ci-dessous.  
+
+Nous avons également créé un script bash qui permet de lancer un serveur et 4 clients à la fois, appliquant sur 4 images en sortie les différents filtres.
+
+## Prérequis 
+
+- **Environnement d'exécution** : Le script `server_et_clients.sh` nécessite un environnement Unix pour son exécution (par exemple, Linux ou macOS). Si vous êtes sous Windows, vous devez utiliser WSL pour pouvoir l'exécuter correctement.  
+  **Note** : Les fichiers `client.go` et `server.go` peuvent être exécutés directement dans un environnement Windows sans problème.
+
+- **Formats d'image supportés** : Le script supporte les formats d'image suivants :
+  - PNG
+  - JPG
 
 ## Lancer le projet
 
@@ -56,7 +80,7 @@ puis
 go run client.go
 ```
 
-#### Sans IHM, simple efficace
+#### Sans IHM, simple et efficace
 ```
 cd client_sans_ihm
 ```
@@ -66,15 +90,11 @@ go run client.go <image_path> <filter_type>
 ```
 Rappel : <filter_type> est un entier, qui doit être parmi les valeurs suivantes :  1 - Niveaux de gris ; 2 - Détection de contours ; 3 - Netteté ; 4 - Flou gaussien
 
-### Lancer un script qui lance un serveur et plusieurs clients
+### Lancer un script qui lance un serveur un client par filtre
 
 Lorsque vous êtes dans un terminal dans le répertoire du projet, lancez le script avec la commande :
 ```
-bash server_et_clients.sh
+bash server_et_clients.sh <image>
 ```
-Attention : ce script est écrit pour traiter une image lyon.jpg présente dans le répertoire client.  
-Pour utiliser une autre image ou un autre chemin, modifiez manuellement le script bash avec par exemple la commande :
-```
-nano server_et_clients.sh
-```
-Remplacez partout où apparait : client_sans_ihm/lyon.jpg
+avec <image> le chemin d'accès vers l'image sur laquelle on souhaite appliquer les filtres.  
+(Rappel : Il n'y a pas de choix de filtre ici puisque tous seront appliqués.)
